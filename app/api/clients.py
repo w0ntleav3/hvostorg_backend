@@ -10,7 +10,7 @@ from .. import db
 @api_bp.route('/clients', methods=['GET'])
 def get_clients():
     clients = Client.query.order_by(Client.name.asc()).all()
-    return jsonify([c.to_dict() for c in clients])  # или как у тебя в get_entity
+    return jsonify([c.to_dict() for c in clients])
 
 
 @api_bp.route('/clients/<int:id>', methods=['GET'])
@@ -141,7 +141,6 @@ def admin_get_client(id):
                     "comment": record.comment,
                     "file_link": record.file_link
                 })
-
         pets_list.append({
             "id_pet": pet.id_pet,
             "name": pet.name,

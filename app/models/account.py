@@ -6,7 +6,7 @@ class Account(BaseModel):
     login = db.Column(db.String(50), nullable=False)
     password = db.Column(db.String(50), nullable=False)
     id_role = db.Column(db.Integer, nullable=False)
-    employees = db.relationship('Employee', backref='account', lazy=True)
+    employee = db.relationship('Employee', backref='account', uselist=False)
 
     def __repr__(self):
         return f"<Account {self.login}>"

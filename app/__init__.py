@@ -17,6 +17,7 @@ def create_app():
     db.init_app(app)
     migrate.init_app(app, db)
     cors.init_app(app, resources={r"/api/*": {"origins": "http://localhost:3000"}}, supports_credentials=True)
+
     jwt = JWTManager(app)
     jwt.init_app(app)  # ⚠ инициализация JWTManager с приложением
 
