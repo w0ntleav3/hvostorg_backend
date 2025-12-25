@@ -20,6 +20,3 @@ def create_entity(entity, **kwargs):
     db.session.add(new_entity)
     db.session.commit()
     return new_entity
-
-def del_entity(entity):
-    return

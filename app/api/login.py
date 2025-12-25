@@ -18,7 +18,7 @@ def login():
 
     access_token = create_access_token(identity=str(account.id_account))
 
-    # проверяем, есть ли связанный сотрудник (врач)
+    # проверяем, есть ли связанный сотрудник
     id_emp = None
     if hasattr(account, 'employee') and account.employee:
         id_emp = account.employee.id_emp
@@ -47,7 +47,6 @@ def register():
     if Account.query.filter_by(login=email).first():
         return jsonify({'error': 'Аккаунт уже существует'}), 400
 
-    # 1️⃣ создаём аккаунт
     account = Account(
         login=email,
         password=password,
@@ -56,11 +55,10 @@ def register():
     db.session.add(account)
     db.session.flush()  # чтобы получить id_account
 
-    # 2️⃣ создаём клиента
     client = Client(
         name=name,
         email=email,
-        phone='-',  # временно
+        phone='-',
         discount=0,
         id_account=account.id_account
     )

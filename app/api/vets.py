@@ -28,7 +28,7 @@ def get_free_slots_for_day(vet_id: int, target_date: date):
         if not r.date_service:
             continue
 
-        # если вдруг это date
+        # если date
         if isinstance(r.date_service, date) and not isinstance(r.date_service, datetime):
             continue
 
@@ -47,7 +47,6 @@ def get_free_slots_for_day(vet_id: int, target_date: date):
     return slots
 
 
-# ВЕТЫ
 @api_bp.route('/vets', methods=['GET'])
 def get_vets():
     vets = db.session.query(Vet, Employee).join(Employee).all()

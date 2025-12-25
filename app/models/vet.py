@@ -1,6 +1,6 @@
 from app import db
 from .basemodel import BaseModel
-from .employee import Employee
+
 
 class Vet(BaseModel):
     __tablename__ = 'vet'

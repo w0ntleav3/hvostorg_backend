@@ -1,6 +1,6 @@
 from flask import jsonify, request
 from . import api_bp
-from .utils import get_entity, create_entity, del_entity
+from .utils import get_entity
 from app.models.med_card import MedCard
 from .. import db
 

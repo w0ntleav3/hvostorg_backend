@@ -1,11 +1,8 @@
-from flask import jsonify, request
-
-from .utils import get_entity, create_entity, del_entity
-
+from flask import request
+from .utils import get_entity, create_entity
 from flask import jsonify
 from . import api_bp
 from app import db
-from app.models.record_service import RecordService
 from app.models.record_service import RecordService
 from app.models.med_card import MedCard
 from app.models.pet import Pet
@@ -60,19 +57,37 @@ def get_records_with_details():
 
     return jsonify(result)
 
-# Получить все записи (посещения)
+# Получить все записи
 @api_bp.route('/records', methods=['GET'])
 def get_records():
     return get_entity(RecordService)
 
-# Получить запись (посещение) по айди
+# Получить запись по айди
 @api_bp.route('/records/<int:id>', methods=['GET'])
 def get_record(id):
     return get_entity(RecordService, id)
 
-# Создать запись (посещение)
+# Создать запись
 @api_bp.route('/records', methods=['POST'])
 def create_record():
     data = request.get_json()
     record_service = create_entity(RecordService, **data)
     return jsonify({"id_record": record_service.id_record})
+
+# Обновить комментарий и/или ссылку на файл у записи
+@api_bp.route('/records/<int:id>', methods=['PATCH'])
+def update_record(id):
+    record = RecordService.query.get_or_404(id)
+    data = request.get_json()
+
+    if 'comment' in data:
+        record.comment = data['comment']
+    if 'file_link' in data:
+        record.file_link = data['file_link']
+
+    db.session.commit()
+    return jsonify({
+        "id_record": record.id_record,
+        "comment": record.comment,
+        "file_link": record.file_link
+    })

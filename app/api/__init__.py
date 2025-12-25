@@ -19,5 +19,4 @@ from . import (
     services,
     vets,
     utils,
-    client_info
 )

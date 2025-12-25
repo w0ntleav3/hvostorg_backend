@@ -65,20 +65,34 @@ def client_me():
 
     pets_list = []
     for pet in getattr(client, 'pets', []):
+        med_cards_list = []
         records_list = []
-        for med_card in getattr(pet, 'med_cards', []):
-            for record in med_card.records:
+
+        # приводим к массиву, даже если одна карточка
+        pet_med_cards = getattr(pet, 'med_cards', None) or (
+            [getattr(pet, 'med_card', None)] if getattr(pet, 'med_card', None) else [])
+
+        for med_card in pet_med_cards:
+            if not med_card:
+                continue
+            med_cards_list.append({
+                "id_med_card": med_card.id_med_card,
+                "date_open": med_card.date_open.isoformat() if med_card.date_open else None
+            })
+
+            for record in getattr(med_card, 'records', []):
                 records_list.append({
                     "id_record": record.id_record,
                     "date_service": record.date_service.isoformat() if record.date_service else None,
                     "service": {"name": record.service.name_service} if record.service else {"name": "-"},
                     "employee": {
-                                    "id": record.employee.id_emp,
-                                    "name": record.employee.name_emp
-                                } if record.employee else {"id": None, "name": "-"},
+                        "id": record.employee.id_emp,
+                        "name": record.employee.name_emp
+                    } if record.employee else {"id": None, "name": "-"},
                     "comment": record.comment,
                     "file_link": record.file_link
                 })
+
         pets_list.append({
             "id_pet": pet.id_pet,
             "name": pet.name,
@@ -87,6 +101,7 @@ def client_me():
             "breed": pet.breed,
             "date_birth": pet.date_birth.isoformat() if pet.date_birth else None,
             "photo": pet.photo,
+            "med_cards": med_cards_list,
             "records": records_list
         })
 
@@ -100,6 +115,34 @@ def client_me():
         },
         "pets": pets_list
     })
+
+@api_bp.route('/clients/me', methods=['PUT'])
+@jwt_required()
+def update_client_me():
+    id_account = int(get_jwt_identity())
+
+    account = Account.query.get(id_account)
+    if not account or not account.client:
+        return jsonify({"error": "Клиент не найден"}), 404
+
+    client_list = getattr(account, "client", [])
+    if not client_list:
+        return jsonify({"error": "Клиент не найден"}), 404
+
+    client = client_list[0]
+
+    data = request.get_json()
+    if not data or 'phone' not in data:
+        return jsonify({"error": "Номер телефона не передан"}), 400
+
+    client.phone = data['phone']
+    db.session.commit()
+
+    return jsonify({
+        "message": "Телефон обновлён",
+        "phone": client.phone
+    })
+
 
 
 @api_bp.route('/clients/admin/<int:id>', methods=['GET'])

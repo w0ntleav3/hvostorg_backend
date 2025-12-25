@@ -1,5 +1,3 @@
-
-
 from app import db
 from .basemodel import BaseModel
 
@@ -18,8 +16,6 @@ class RecordService(BaseModel):
     med_card = db.relationship('MedCard', back_populates='records')
     service = db.relationship('Service', backref='records')
     employee = db.relationship('Employee', backref='records')
-
-
 
 
     def __repr__(self):

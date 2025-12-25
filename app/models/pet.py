@@ -1,6 +1,5 @@
 from app import db
 from .basemodel import BaseModel
-from .record_service import RecordService
 
 class Pet(BaseModel):
     id_pet = db.Column(db.Integer, primary_key=True, autoincrement=True)
