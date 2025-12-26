@@ -7,7 +7,8 @@ from .utils import get_entity
 from app.models.employee import Employee
 from app.models.vet import Vet
 from app.models.record_service import RecordService
-
+from ..models import Pet, Client
+from ..models.med_card import MedCard
 
 # НАСТРОЙКИ РАБОЧЕГО ДНЯ
 WORK_START = time(10, 0)
@@ -131,3 +132,52 @@ def get_vet_available_slots(id):
 
     slots = get_free_slots_for_day(id, target_date)
     return jsonify({"slots": slots})
+
+
+@api_bp.route('/vets/with-records', methods=['GET'])
+def get_vets_with_records():
+    now = datetime.now()
+
+    vets = (
+        db.session.query(Vet, Employee)
+        .join(Employee, Vet.id_emp == Employee.id_emp)
+        .all()
+    )
+
+    result = []
+
+    for vet, emp in vets:
+        records = (
+            db.session.query(
+                RecordService,
+                MedCard,
+                Pet
+            )
+            .select_from(RecordService)
+            .join(MedCard, RecordService.id_med_card == MedCard.id_med_card)
+            .join(Pet, MedCard.id_pet == Pet.id_pet)
+            .filter(
+                RecordService.id_emp == vet.id_emp,
+                RecordService.date_service >= now
+            )
+            .all()
+        )
+
+        future_records = []
+        for r, mc, pet in records:
+            future_records.append({
+                "id_record": r.id_record,
+                "date_service": r.date_service.isoformat(),
+                "pet_id": pet.id_pet,
+                "pet_name": pet.name
+            })
+
+        result.append({
+            "id_emp": vet.id_emp,
+            "name": emp.name_emp,
+            "spec": vet.spec,
+            "rating": vet.rating,
+            "future_records": future_records
+        })
+
+    return jsonify(result)
