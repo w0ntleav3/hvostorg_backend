@@ -2,7 +2,7 @@ from flask import jsonify, request
 from . import api_bp
 from .utils import get_entity, create_entity
 from app.models.pet_type import PetType
-from .. import db
+
 
 
 # Получить все виды животных
@@ -22,12 +22,3 @@ def create_pet_type():
     return jsonify(new_type.to_dict()), 201
 
 
-# Удалить вид (опционально)
-@api_bp.route('/pet_types/<int:id>', methods=['DELETE'])
-def delete_pet_type(id):
-    obj = PetType.query.get(id)
-    if not obj:
-        return jsonify({"error": "Вид не найден"}), 404
-    db.session.delete(obj)
-    db.session.commit()
-    return jsonify({"message": "Удалено"}), 200

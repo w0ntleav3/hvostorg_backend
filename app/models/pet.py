@@ -1,20 +1,42 @@
-# app/models/pet.py
 from app import db
 from .basemodel import BaseModel
 
 
 class Pet(BaseModel):
     __tablename__ = 'pet'
-    id_pet = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    id_client = db.Column(db.Integer, db.ForeignKey('client.id_client'), nullable=False)
-    name = db.Column(db.String(100))
-    sex = db.Column(db.String(1))
 
-    # Новое поле вместо строк type и breed
-    id_breed = db.Column(db.Integer, db.ForeignKey('breed.id_breed'), nullable=True)
+    id_pet = db.Column(db.Integer, primary_key=True, autoincrement=True)
+
+    id_client = db.Column(
+        db.Integer,
+        db.ForeignKey('client.id_client'),
+        nullable=False
+    )
+
+    name = db.Column(db.String(100))
+
+    sex = db.Column(
+        db.String(1),
+        nullable=True
+    )
+
+    id_breed = db.Column(
+        db.Integer,
+        db.ForeignKey('breed.id_breed'),
+        nullable=True
+    )
 
     date_birth = db.Column(db.Date)
+
     photo = db.Column(db.Text)
+
+    # CHECK constraint
+    __table_args__ = (
+        db.CheckConstraint(
+            "sex IN ('M', 'F')",
+            name='chk_pet_sex'
+        ),
+    )
 
     # Отношения
     breed_rel = db.relationship('Breed', backref='pets')
