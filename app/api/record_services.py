@@ -71,8 +71,22 @@ def get_record(id):
 @api_bp.route('/records', methods=['POST'])
 def create_record():
     data = request.get_json()
+
+    existing = RecordService.query.filter_by(
+        id_emp=data['id_emp'],
+        date_service=data['date_service']
+    ).first()
+
+    if existing:
+        return jsonify({
+            "error": "Это время уже занято"
+        }), 400
+
     record_service = create_entity(RecordService, **data)
-    return jsonify({"id_record": record_service.id_record})
+
+    return jsonify({
+        "id_record": record_service.id_record
+    })
 
 # Обновить комментарий и/или ссылку на файл у записи
 @api_bp.route('/records/<int:id>', methods=['PATCH'])

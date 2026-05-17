@@ -2,6 +2,7 @@ from flask import jsonify, request
 from . import api_bp
 from .utils import get_entity
 from app.models.diagnosis_pet import Diagnosis_pet
+from .. import db
 
 
 @api_bp.route('/diagnosis_pets', methods=['GET'])
@@ -17,25 +18,30 @@ def get_diagnosis_pet():
 def create_diagnosis_pets():
     data = request.get_json()
 
-    # проверяем обязательные поля
-    required_fields = ['id_med_card', 'id_diagnosis', 'date_diagnosis', 'status']
-    for f in required_fields:
-        if f not in data:
-            return jsonify({"error": f"'{f}' обязателен"}), 400
+    id_med_card = data.get('id_med_card')
+    id_diagnosis = data.get('id_diagnosis')
+    date_diagnosis = data.get('date_diagnosis')
+    status = data.get('status', True)
+    comments = data.get('comments', '')
 
-    diagnosis_pet = Diagnosis_pet(
-        id_med_card=data['id_med_card'],
-        id_diagnosis=data['id_diagnosis'],
-        date_diagnosis=data['date_diagnosis'],
-        status=data['status'],
-        comments=data.get('comments')
+    # 💀 защита от NULL
+    if id_diagnosis is None:
+        return jsonify({"error": "id_diagnosis обязателен"}), 400
+
+    new_row = Diagnosis_pet(
+        id_med_card=id_med_card,
+        id_diagnosis=id_diagnosis,
+        date_diagnosis=date_diagnosis,
+        status=status,
+        comments=comments
     )
 
-    from app import db
-    db.session.add(diagnosis_pet)
+    db.session.add(new_row)
     db.session.commit()
 
-    return jsonify({"id_diagnosis_record": diagnosis_pet.id_diagnosis_record})
+    return jsonify({
+        "id_diagnosis_pet": new_row.id_diagnosis_record
+    })
 
 
 @api_bp.route('/diagnosis_pets/<int:id>', methods=['PATCH'])

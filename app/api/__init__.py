@@ -19,4 +19,6 @@ from . import (
     services,
     vets,
     utils,
+    breeds,
+    pet_types
 )

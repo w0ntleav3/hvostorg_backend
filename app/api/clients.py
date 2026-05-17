@@ -84,11 +84,18 @@ def client_me():
                 records_list.append({
                     "id_record": record.id_record,
                     "date_service": record.date_service.isoformat() if record.date_service else None,
-                    "service": {"name": record.service.name_service} if record.service else {"name": "-"},
+
+                    "service": {
+                        "id_service": record.service.id_service,
+                        "name_service": record.service.name_service,
+                        "cost": record.service.cost
+                    } if record.service else None,
+
                     "employee": {
-                        "id": record.employee.id_emp,
-                        "name": record.employee.name_emp
-                    } if record.employee else {"id": None, "name": "-"},
+                        "id_emp": record.employee.id_emp,
+                        "name_emp": record.employee.name_emp
+                    } if record.employee else None,
+
                     "comment": record.comment,
                     "file_link": record.file_link
                 })
@@ -97,8 +104,8 @@ def client_me():
             "id_pet": pet.id_pet,
             "name": pet.name,
             "sex": pet.sex,
-            "type": pet.type,
-            "breed": pet.breed,
+            "type": pet.breed_rel.pet_type.name_type if pet.breed_rel and pet.breed_rel.pet_type else None,
+            "breed": pet.breed_rel.name_breed if pet.breed_rel else None,
             "date_birth": pet.date_birth.isoformat() if pet.date_birth else None,
             "photo": pet.photo,
             "med_cards": med_cards_list,
@@ -188,8 +195,8 @@ def admin_get_client(id):
             "id_pet": pet.id_pet,
             "name": pet.name,
             "sex": pet.sex,
-            "type": pet.type,
-            "breed": pet.breed,
+            "type": pet.breed_rel.pet_type.name_type if pet.breed_rel and pet.breed_rel.pet_type else None,
+            "breed": pet.breed_rel.name_breed if pet.breed_rel else None,
             "date_birth": pet.date_birth.isoformat() if pet.date_birth else None,
             "photo": pet.photo,
             "med_cards": med_cards_list,
